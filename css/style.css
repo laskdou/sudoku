@@ -28,11 +28,11 @@
   --on-accent: #FFFFFF;
   --hint: #A97A33;
   --warn: #B95C4B;
-  --hl-peer: #F1F4F2;
-  --hl-selected: #DCE9E2;
-  --hl-same: #CFE0D8;
-  --hl-same-ring: rgba(77, 120, 104, .32);
-  --hl-conflict: #F8E6E2;
+  --hl-peer: #E4EBE7;
+  --hl-selected: #CFE0D8;
+  --hl-same: #BDD4CA;
+  --hl-same-ring: rgba(62, 102, 86, .48);
+  --hl-conflict: #F5DCD7;
   --shadow-sm: 0 1px 2px rgba(70, 58, 36, .06), 0 2px 8px -2px rgba(70, 58, 36, .06);
   --shadow: 0 1px 2px rgba(70, 58, 36, .05), 0 10px 30px -8px rgba(70, 58, 36, .12), 0 40px 80px -40px rgba(70, 58, 36, .22);
   --backdrop: rgba(42, 41, 38, .22);
@@ -417,8 +417,8 @@ button:focus-visible {
 .cell::after {
   content: "";
   position: absolute;
-  inset: 2px;
-  border-radius: calc(var(--board) * .014);
+  inset: 2.5px;
+  border-radius: calc(var(--board) * .015);
   box-shadow: inset 0 0 0 2.2px var(--accent);
   opacity: 0;
   transform: scale(.86);
@@ -446,8 +446,12 @@ button:focus-visible {
 .cell.is-peer { background: var(--hl-peer); }
 .cell.is-same {
   background: var(--hl-same);
-  box-shadow: inset 0 0 0 1.5px var(--hl-same-ring);
   font-weight: 700;
+}
+.cell.is-same::after {
+  box-shadow: inset 0 0 0 1.5px var(--hl-same-ring);
+  opacity: 1;
+  transform: scale(1);
 }
 .cell.is-same:not(.is-given):not(.is-hinted) { color: var(--accent-ink); }
 .cell.is-selected {
@@ -459,7 +463,11 @@ button:focus-visible {
 .cell.is-conflict { color: var(--warn); }
 .cell.is-conflict:not(.is-given) {
   background: var(--hl-conflict);
-  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--warn) 42%, transparent);
+}
+.cell.is-conflict:not(.is-given):not(.is-selected)::after {
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--warn) 45%, transparent);
+  opacity: 1;
+  transform: scale(1);
 }
 .cell.is-mistake { color: var(--warn); }
 .cell.is-mistake .v { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: .18em; text-decoration-color: color-mix(in oklab, var(--warn) 50%, transparent); }
