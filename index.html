@@ -251,6 +251,10 @@
   <script src="js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+      var reloaded = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        if (!reloaded) { reloaded = true; location.reload(); }
+      });
       navigator.serviceWorker.register('./sw.js').catch(function () {});
     }
   </script>

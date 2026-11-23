@@ -139,12 +139,12 @@ button:focus-visible {
 /* ---------- Каркас ---------- */
 
 .app {
-  --board: max(240px, min(calc(100vw - 20px), 480px, calc(100svh - 305px - env(safe-area-inset-top) - env(safe-area-inset-bottom))));
+  --board: max(260px, min(calc(100vw - 12px), 480px, calc(100svh - 285px)));
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: max(8px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom));
+  padding: max(6px, env(safe-area-inset-top)) 6px max(8px, env(safe-area-inset-bottom));
 }
 
 .topbar {
@@ -412,7 +412,7 @@ button:focus-visible {
   display: grid;
   place-items: center;
   background: var(--surface);
-  font-size: calc(var(--board) * .065);
+  font-size: calc(var(--board) * .07);
   font-weight: 550;
   line-height: 1;
   color: var(--accent-ink);
@@ -724,7 +724,7 @@ button:focus-visible {
 
 .key {
   position: relative;
-  height: 52px;
+  height: 56px;
   border-radius: var(--r-sm);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
@@ -739,7 +739,7 @@ button:focus-visible {
 .key:hover { background: var(--surface-2); }
 .key:active { transform: scale(.94); }
 .key .d {
-  font-size: clamp(22px, calc(var(--board) * .065), 28px);
+  font-size: clamp(24px, calc(var(--board) * .07), 29px);
   font-weight: 550;
   line-height: 1;
   transition: font-size .2s var(--ease), transform .2s var(--ease);
