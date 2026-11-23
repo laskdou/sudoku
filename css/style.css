@@ -28,6 +28,11 @@
   --on-accent: #FFFFFF;
   --hint: #A97A33;
   --warn: #B95C4B;
+  --hl-peer: #F1F4F2;
+  --hl-selected: #DCE9E2;
+  --hl-same: #CFE0D8;
+  --hl-same-ring: rgba(77, 120, 104, .32);
+  --hl-conflict: #F8E6E2;
   --shadow-sm: 0 1px 2px rgba(70, 58, 36, .06), 0 2px 8px -2px rgba(70, 58, 36, .06);
   --shadow: 0 1px 2px rgba(70, 58, 36, .05), 0 10px 30px -8px rgba(70, 58, 36, .12), 0 40px 80px -40px rgba(70, 58, 36, .22);
   --backdrop: rgba(42, 41, 38, .22);
@@ -50,6 +55,11 @@
   --on-accent: #0F1E18;
   --hint: #D6AC69;
   --warn: #E28C7B;
+  --hl-peer: #222825;
+  --hl-selected: #2B3C34;
+  --hl-same: #31463D;
+  --hl-same-ring: rgba(141, 184, 165, .38);
+  --hl-conflict: #3A2522;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35);
   --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 24px 60px -24px rgba(0, 0, 0, .7);
   --backdrop: rgba(0, 0, 0, .5);
@@ -433,23 +443,23 @@ button:focus-visible {
   opacity: .8;
 }
 
-.cell.is-peer { background: color-mix(in oklab, var(--surface) 84%, var(--accent)); }
+.cell.is-peer { background: var(--hl-peer); }
 .cell.is-same {
-  background: color-mix(in oklab, var(--surface) 64%, var(--accent));
-  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--accent) 45%, transparent);
+  background: var(--hl-same);
+  box-shadow: inset 0 0 0 1.5px var(--hl-same-ring);
   font-weight: 700;
 }
 .cell.is-same:not(.is-given):not(.is-hinted) { color: var(--accent-ink); }
 .cell.is-selected {
-  background: color-mix(in oklab, var(--surface) 74%, var(--accent));
+  background: var(--hl-selected);
   font-weight: 700;
 }
 .cell.is-selected::after { opacity: 1; transform: scale(1); }
 
 .cell.is-conflict { color: var(--warn); }
 .cell.is-conflict:not(.is-given) {
-  background: color-mix(in oklab, var(--surface) 78%, var(--warn));
-  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--warn) 45%, transparent);
+  background: var(--hl-conflict);
+  box-shadow: inset 0 0 0 1.5px color-mix(in oklab, var(--warn) 42%, transparent);
 }
 .cell.is-mistake { color: var(--warn); }
 .cell.is-mistake .v { text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: .18em; text-decoration-color: color-mix(in oklab, var(--warn) 50%, transparent); }
