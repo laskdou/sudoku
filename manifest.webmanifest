@@ -1,0 +1,24 @@
+{
+  "name": "Судоку",
+  "short_name": "Судоку",
+  "description": "Спокойное офлайн-судоку с 5 уровнями сложности",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2EFE9",
+  "theme_color": "#F2EFE9",
+  "icons": [
+    {
+      "src": "icons/icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
