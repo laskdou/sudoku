@@ -34,7 +34,6 @@
       theme: 'auto',
       sound: true,
       autoFill: true,
-      showMistakes: false,
       highlightSame: true,
       highlightPeers: true,
       progress,
@@ -213,7 +212,7 @@
     setTimeout(() => {
       if (token !== loadToken) return;
       const saved = store.games[gameKey(d, l)];
-      let puzzle, solution, values, notes, hinted, elapsed = 0, used = 0;
+      let puzzle, solution, values, notes, hinted, elapsed = 0, used = 0, mistakes = 0;
       if (saved && saved.p && saved.p.length === 81 && saved.s && saved.v) {
         puzzle = Array.from(saved.p, Number);
         solution = Array.from(saved.s, Number);
@@ -222,6 +221,7 @@
         hinted = saved.h || [];
         elapsed = saved.t || 0;
         used = saved.u || 0;
+        mistakes = saved.m || 0;
       } else {
         const res = E.generate(d, l);
         puzzle = res.puzzle;
@@ -237,10 +237,11 @@
         hinted: new Set(hinted),
         elapsed,
         hintsUsed: used,
+        mistakes,
         history: [],
         solved: false,
+        lost: false,
         replay: isCompleted(d, l),
-        revealMistakes: false,
       };
       loading = false;
       boardWrap.classList.remove('is-loading');
@@ -263,6 +264,7 @@
       h: Array.from(G.hinted),
       t: Math.round(G.elapsed),
       u: G.hintsUsed,
+      m: G.mistakes || 0,
       at: Date.now(),
     };
     const ks = Object.keys(store.games);
@@ -291,7 +293,6 @@
   function renderBoard() {
     const conflicts = G ? computeConflicts() : null;
     const selV = G && selected >= 0 ? G.values[selected] : 0;
-    const showMist = G && (store.showMistakes || G.revealMistakes);
 
     for (let i = 0; i < 81; i++) {
       const el = cells[i];
@@ -312,7 +313,6 @@
         else if (selected >= 0 && store.highlightPeers && isPeer(i, selected)) c += ' is-peer';
         if (store.highlightSame && selV && v === selV && i !== selected) c += ' is-same';
         if (v && conflicts[i]) c += ' is-conflict';
-        if (showMist && v && !G.given[i] && v !== G.solution[i]) c += ' is-mistake';
       } else c += ' is-solved';
 
       if (pulse.has(i)) c += ' is-pulse';
@@ -362,6 +362,11 @@
     $('#levelNum').parentElement.classList.toggle('is-done', isCompleted(viewD, viewL));
     $('#prevLvl').disabled = viewL <= 1;
     $('#bankCount').textContent = store.hints;
+
+    const m = G ? (G.mistakes || 0) : 0;
+    const mEl = $('#mistakes');
+    mEl.setAttribute('aria-label', 'Ошибки: ' + m + ' из 3');
+    Array.from(mEl.children).forEach((dot, idx) => dot.classList.toggle('on', idx < m));
 
     const timerBtn = $('#timerBtn');
     timerBtn.classList.toggle('is-paused', paused);
@@ -504,6 +509,18 @@
     } else if (G.values[i] === d) {
       mutate((rec) => { rec(i); G.values[i] = 0; });
       S.erase();
+    } else if (d !== G.solution[i]) {
+      G.mistakes = (G.mistakes || 0) + 1;
+      nudge(i);
+      if (G.mistakes >= 3) {
+        lose();
+      } else {
+        persistGame();
+        renderChrome();
+        const left = 3 - G.mistakes;
+        toast('Ошибка · ' + plural(left, 'осталась', 'осталось', 'осталось') + ' ' + left + ' ' + plural(left, 'попытка', 'попытки', 'попыток'));
+      }
+      return;
     } else {
       const bit = 1 << (d - 1);
       mutate((rec) => {
@@ -515,9 +532,7 @@
         }
       });
       markFresh(i);
-      const unitHit = d === G.solution[i] && celebrateUnits(i);
-      if (store.showMistakes && d !== G.solution[i]) S.error();
-      else if (!unitHit) S.place(d);
+      if (!celebrateUnits(i)) S.place(d);
     }
     afterChange();
   }
@@ -687,19 +702,33 @@
   function checkComplete() {
     if (!G || G.solved) return false;
     for (let i = 0; i < 81; i++) if (!G.values[i]) return false;
-    for (let i = 0; i < 81; i++) {
-      if (G.values[i] !== G.solution[i]) {
-        if (!G.revealMistakes) {
-          G.revealMistakes = true;
-          S.error();
-          toast('Поле заполнено, но есть ошибки — они подчёркнуты');
-          render();
-        }
-        return true;
-      }
-    }
     win();
     return true;
+  }
+
+  function lose() {
+    const L = LEVELS[G.d];
+    const secs = Math.round(G.elapsed / 1000);
+    G.solved = true;
+    G.lost = true;
+    autoFilling = false;
+    selected = -1;
+    notesMode = false;
+    store.streak = 0;
+    delete store.games[gameKey(G.d, G.l)];
+    save();
+    render();
+
+    $('#winEyebrow').textContent = 'Уровень ' + G.l + ' · ' + L.name;
+    $('#winTitle').textContent = 'Игра проиграна';
+    $('#winTime').textContent = fmt(secs);
+    $('#winTime').classList.add('is-lost');
+    const box = $('#winReward');
+    box.classList.remove('is-earned');
+    box.textContent = 'Допущено 3 ошибки. Попробуйте пройти этот уровень заново.';
+    $('#winBest').innerHTML = '';
+    $('#winNext').textContent = 'Начать заново';
+    openSheet('winSheet');
   }
 
   function win() {
@@ -741,6 +770,8 @@
     $('#winEyebrow').textContent = 'Уровень ' + G.l + ' · ' + r.L.name;
     $('#winTitle').textContent = r.earned ? 'Отлично' : 'Решено';
     $('#winTime').textContent = fmt(r.secs);
+    $('#winTime').classList.remove('is-lost');
+    $('#winNext').textContent = 'Следующий уровень';
     const box = $('#winReward');
     box.classList.toggle('is-earned', r.earned > 0);
     if (r.earned) {
@@ -842,7 +873,6 @@
   function syncSettings() {
     $('#optSound').checked = store.sound !== false;
     $('#optAutoFill').checked = store.autoFill !== false;
-    $('#optMistakes').checked = !!store.showMistakes;
     $('#optSame').checked = !!store.highlightSame;
     $('#optPeers').checked = !!store.highlightPeers;
     S.setEnabled(store.sound !== false);
@@ -913,8 +943,9 @@
     document.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', closeSheet));
 
     $('#winNext').addEventListener('click', () => {
+      const lost = G && G.lost;
       closeSheet();
-      loadLevel(viewD, viewL + 1);
+      loadLevel(viewD, lost ? viewL : viewL + 1);
     });
 
     $('#themeSeg').addEventListener('click', (e) => {
@@ -935,7 +966,6 @@
       save();
       if (store.autoFill && canAutoFill()) runAutoFill();
     });
-    $('#optMistakes').addEventListener('change', (e) => { store.showMistakes = e.target.checked; save(); render(); });
     $('#optSame').addEventListener('change', (e) => { store.highlightSame = e.target.checked; save(); render(); });
     $('#optPeers').addEventListener('change', (e) => { store.highlightPeers = e.target.checked; save(); render(); });
 
@@ -974,7 +1004,6 @@
           if (G.values[i] || G.notes[i]) { rec(i); G.values[i] = 0; G.notes[i] = 0; }
         }
       });
-      G.revealMistakes = false;
       closeSheet();
       toast('Поле очищено. Отменить можно кнопкой «Отменить»');
       afterChange();

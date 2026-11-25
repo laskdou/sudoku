@@ -85,6 +85,7 @@
             <svg class="ic"><use href="#i-right"/></svg>
           </button>
         </div>
+        <div class="mistakes" id="mistakes" title="Ошибки (3 — проигрыш)" aria-label="Ошибки: 0 из 3"><i></i><i></i><i></i></div>
         <button class="timer" id="timerBtn" type="button" title="Пауза (P)">
           <svg class="ic ic-pause"><use href="#i-pause"/></svg>
           <svg class="ic ic-play"><use href="#i-play"/></svg>
@@ -175,10 +176,6 @@
         <input type="checkbox" id="optSound"><i class="switch"></i>
       </label>
       <label class="switch-row">
-        <span><b>Подсвечивать ошибки</b><small>Неверные цифры отмечаются сразу</small></span>
-        <input type="checkbox" id="optMistakes"><i class="switch"></i>
-      </label>
-      <label class="switch-row">
         <span><b>Одинаковые цифры</b><small>Выделять такие же цифры и заметки</small></span>
         <input type="checkbox" id="optSame"><i class="switch"></i>
       </label>
@@ -205,7 +202,7 @@
         <h2 id="helpTitle">Как играть</h2>
         <button class="icon-btn small" type="button" data-close aria-label="Закрыть"><svg class="ic"><use href="#i-close"/></svg></button>
       </div>
-      <p class="prose">Заполните поле так, чтобы в каждой строке, каждом столбце и каждом блоке 3×3 цифры от 1 до 9 встречались ровно по одному разу.</p>
+      <p class="prose">Заполните поле так, чтобы в каждой строке, каждом столбце и каждом блоке 3×3 цифры от 1 до 9 встречались ровно по одному разу. Неверную цифру поставить нельзя — <b>три ошибки</b> завершают партию.</p>
 
       <h3 class="sub">Подсказки нужно заработать</h3>
       <p class="prose">Решите новый уровень <b>без подсказок</b> быстрее целевого времени — и в запас добавятся подсказки для следующих игр.</p>

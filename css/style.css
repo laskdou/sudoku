@@ -338,6 +338,24 @@ button:focus-visible {
 }
 .level-num.is-done .done-mark { display: block; }
 
+.mistakes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+}
+.mistakes i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--faint);
+  transition: background-color .25s var(--ease-soft), transform .25s var(--ease);
+}
+.mistakes i.on {
+  background: var(--warn);
+  transform: scale(1.15);
+}
+
 .timer {
   display: flex;
   align-items: center;
@@ -1019,6 +1037,7 @@ kbd {
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
+.win-time.is-lost { color: var(--warn); }
 .win-reward {
   margin: 20px auto 0;
   padding: 14px 16px;

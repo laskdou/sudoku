@@ -351,6 +351,24 @@ button:focus-visible {
 }
 .level-num.is-done .done-mark { display: block; }
 
+.mistakes {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+}
+.mistakes i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--faint);
+  transition: background-color .25s var(--ease-soft), transform .25s var(--ease);
+}
+.mistakes i.on {
+  background: var(--warn);
+  transform: scale(1.15);
+}
+
 .timer {
   display: flex;
   align-items: center;
@@ -1032,6 +1050,7 @@ kbd {
   font-variant-numeric: tabular-nums;
   line-height: 1.1;
 }
+.win-time.is-lost { color: var(--warn); }
 .win-reward {
   margin: 20px auto 0;
   padding: 14px 16px;
@@ -1240,6 +1259,7 @@ kbd {
             <svg class="ic"><use href="#i-right"/></svg>
           </button>
         </div>
+        <div class="mistakes" id="mistakes" title="Ошибки (3 — проигрыш)" aria-label="Ошибки: 0 из 3"><i></i><i></i><i></i></div>
         <button class="timer" id="timerBtn" type="button" title="Пауза (P)">
           <svg class="ic ic-pause"><use href="#i-pause"/></svg>
           <svg class="ic ic-play"><use href="#i-play"/></svg>
@@ -1330,10 +1350,6 @@ kbd {
         <input type="checkbox" id="optSound"><i class="switch"></i>
       </label>
       <label class="switch-row">
-        <span><b>Подсвечивать ошибки</b><small>Неверные цифры отмечаются сразу</small></span>
-        <input type="checkbox" id="optMistakes"><i class="switch"></i>
-      </label>
-      <label class="switch-row">
         <span><b>Одинаковые цифры</b><small>Выделять такие же цифры и заметки</small></span>
         <input type="checkbox" id="optSame"><i class="switch"></i>
       </label>
@@ -1360,7 +1376,7 @@ kbd {
         <h2 id="helpTitle">Как играть</h2>
         <button class="icon-btn small" type="button" data-close aria-label="Закрыть"><svg class="ic"><use href="#i-close"/></svg></button>
       </div>
-      <p class="prose">Заполните поле так, чтобы в каждой строке, каждом столбце и каждом блоке 3×3 цифры от 1 до 9 встречались ровно по одному разу.</p>
+      <p class="prose">Заполните поле так, чтобы в каждой строке, каждом столбце и каждом блоке 3×3 цифры от 1 до 9 встречались ровно по одному разу. Неверную цифру поставить нельзя — <b>три ошибки</b> завершают партию.</p>
 
       <h3 class="sub">Подсказки нужно заработать</h3>
       <p class="prose">Решите новый уровень <b>без подсказок</b> быстрее целевого времени — и в запас добавятся подсказки для следующих игр.</p>
@@ -1809,7 +1825,6 @@ kbd {
       theme: 'auto',
       sound: true,
       autoFill: true,
-      showMistakes: false,
       highlightSame: true,
       highlightPeers: true,
       progress,
@@ -1988,7 +2003,7 @@ kbd {
     setTimeout(() => {
       if (token !== loadToken) return;
       const saved = store.games[gameKey(d, l)];
-      let puzzle, solution, values, notes, hinted, elapsed = 0, used = 0;
+      let puzzle, solution, values, notes, hinted, elapsed = 0, used = 0, mistakes = 0;
       if (saved && saved.p && saved.p.length === 81 && saved.s && saved.v) {
         puzzle = Array.from(saved.p, Number);
         solution = Array.from(saved.s, Number);
@@ -1997,6 +2012,7 @@ kbd {
         hinted = saved.h || [];
         elapsed = saved.t || 0;
         used = saved.u || 0;
+        mistakes = saved.m || 0;
       } else {
         const res = E.generate(d, l);
         puzzle = res.puzzle;
@@ -2012,10 +2028,11 @@ kbd {
         hinted: new Set(hinted),
         elapsed,
         hintsUsed: used,
+        mistakes,
         history: [],
         solved: false,
+        lost: false,
         replay: isCompleted(d, l),
-        revealMistakes: false,
       };
       loading = false;
       boardWrap.classList.remove('is-loading');
@@ -2038,6 +2055,7 @@ kbd {
       h: Array.from(G.hinted),
       t: Math.round(G.elapsed),
       u: G.hintsUsed,
+      m: G.mistakes || 0,
       at: Date.now(),
     };
     const ks = Object.keys(store.games);
@@ -2066,7 +2084,6 @@ kbd {
   function renderBoard() {
     const conflicts = G ? computeConflicts() : null;
     const selV = G && selected >= 0 ? G.values[selected] : 0;
-    const showMist = G && (store.showMistakes || G.revealMistakes);
 
     for (let i = 0; i < 81; i++) {
       const el = cells[i];
@@ -2087,7 +2104,6 @@ kbd {
         else if (selected >= 0 && store.highlightPeers && isPeer(i, selected)) c += ' is-peer';
         if (store.highlightSame && selV && v === selV && i !== selected) c += ' is-same';
         if (v && conflicts[i]) c += ' is-conflict';
-        if (showMist && v && !G.given[i] && v !== G.solution[i]) c += ' is-mistake';
       } else c += ' is-solved';
 
       if (pulse.has(i)) c += ' is-pulse';
@@ -2137,6 +2153,11 @@ kbd {
     $('#levelNum').parentElement.classList.toggle('is-done', isCompleted(viewD, viewL));
     $('#prevLvl').disabled = viewL <= 1;
     $('#bankCount').textContent = store.hints;
+
+    const m = G ? (G.mistakes || 0) : 0;
+    const mEl = $('#mistakes');
+    mEl.setAttribute('aria-label', 'Ошибки: ' + m + ' из 3');
+    Array.from(mEl.children).forEach((dot, idx) => dot.classList.toggle('on', idx < m));
 
     const timerBtn = $('#timerBtn');
     timerBtn.classList.toggle('is-paused', paused);
@@ -2279,6 +2300,18 @@ kbd {
     } else if (G.values[i] === d) {
       mutate((rec) => { rec(i); G.values[i] = 0; });
       S.erase();
+    } else if (d !== G.solution[i]) {
+      G.mistakes = (G.mistakes || 0) + 1;
+      nudge(i);
+      if (G.mistakes >= 3) {
+        lose();
+      } else {
+        persistGame();
+        renderChrome();
+        const left = 3 - G.mistakes;
+        toast('Ошибка · ' + plural(left, 'осталась', 'осталось', 'осталось') + ' ' + left + ' ' + plural(left, 'попытка', 'попытки', 'попыток'));
+      }
+      return;
     } else {
       const bit = 1 << (d - 1);
       mutate((rec) => {
@@ -2290,9 +2323,7 @@ kbd {
         }
       });
       markFresh(i);
-      const unitHit = d === G.solution[i] && celebrateUnits(i);
-      if (store.showMistakes && d !== G.solution[i]) S.error();
-      else if (!unitHit) S.place(d);
+      if (!celebrateUnits(i)) S.place(d);
     }
     afterChange();
   }
@@ -2462,19 +2493,33 @@ kbd {
   function checkComplete() {
     if (!G || G.solved) return false;
     for (let i = 0; i < 81; i++) if (!G.values[i]) return false;
-    for (let i = 0; i < 81; i++) {
-      if (G.values[i] !== G.solution[i]) {
-        if (!G.revealMistakes) {
-          G.revealMistakes = true;
-          S.error();
-          toast('Поле заполнено, но есть ошибки — они подчёркнуты');
-          render();
-        }
-        return true;
-      }
-    }
     win();
     return true;
+  }
+
+  function lose() {
+    const L = LEVELS[G.d];
+    const secs = Math.round(G.elapsed / 1000);
+    G.solved = true;
+    G.lost = true;
+    autoFilling = false;
+    selected = -1;
+    notesMode = false;
+    store.streak = 0;
+    delete store.games[gameKey(G.d, G.l)];
+    save();
+    render();
+
+    $('#winEyebrow').textContent = 'Уровень ' + G.l + ' · ' + L.name;
+    $('#winTitle').textContent = 'Игра проиграна';
+    $('#winTime').textContent = fmt(secs);
+    $('#winTime').classList.add('is-lost');
+    const box = $('#winReward');
+    box.classList.remove('is-earned');
+    box.textContent = 'Допущено 3 ошибки. Попробуйте пройти этот уровень заново.';
+    $('#winBest').innerHTML = '';
+    $('#winNext').textContent = 'Начать заново';
+    openSheet('winSheet');
   }
 
   function win() {
@@ -2516,6 +2561,8 @@ kbd {
     $('#winEyebrow').textContent = 'Уровень ' + G.l + ' · ' + r.L.name;
     $('#winTitle').textContent = r.earned ? 'Отлично' : 'Решено';
     $('#winTime').textContent = fmt(r.secs);
+    $('#winTime').classList.remove('is-lost');
+    $('#winNext').textContent = 'Следующий уровень';
     const box = $('#winReward');
     box.classList.toggle('is-earned', r.earned > 0);
     if (r.earned) {
@@ -2617,7 +2664,6 @@ kbd {
   function syncSettings() {
     $('#optSound').checked = store.sound !== false;
     $('#optAutoFill').checked = store.autoFill !== false;
-    $('#optMistakes').checked = !!store.showMistakes;
     $('#optSame').checked = !!store.highlightSame;
     $('#optPeers').checked = !!store.highlightPeers;
     S.setEnabled(store.sound !== false);
@@ -2688,8 +2734,9 @@ kbd {
     document.querySelectorAll('[data-close]').forEach((el) => el.addEventListener('click', closeSheet));
 
     $('#winNext').addEventListener('click', () => {
+      const lost = G && G.lost;
       closeSheet();
-      loadLevel(viewD, viewL + 1);
+      loadLevel(viewD, lost ? viewL : viewL + 1);
     });
 
     $('#themeSeg').addEventListener('click', (e) => {
@@ -2710,7 +2757,6 @@ kbd {
       save();
       if (store.autoFill && canAutoFill()) runAutoFill();
     });
-    $('#optMistakes').addEventListener('change', (e) => { store.showMistakes = e.target.checked; save(); render(); });
     $('#optSame').addEventListener('change', (e) => { store.highlightSame = e.target.checked; save(); render(); });
     $('#optPeers').addEventListener('change', (e) => { store.highlightPeers = e.target.checked; save(); render(); });
 
@@ -2749,7 +2795,6 @@ kbd {
           if (G.values[i] || G.notes[i]) { rec(i); G.values[i] = 0; G.notes[i] = 0; }
         }
       });
-      G.revealMistakes = false;
       closeSheet();
       toast('Поле очищено. Отменить можно кнопкой «Отменить»');
       afterChange();
