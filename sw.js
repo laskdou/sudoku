@@ -1,4 +1,4 @@
-const CACHE = 'calm-sudoku-v15';
+const CACHE = 'calm-sudoku-v16';
 const ASSETS = [
   './',
   './index.html',
