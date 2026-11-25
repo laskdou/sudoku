@@ -28,9 +28,11 @@
   --on-accent: #FFFFFF;
   --hint: #A97A33;
   --warn: #B95C4B;
-  --hl-peer: #E8F0EC;
-  --hl-selected: #CFE0D8;
-  --hl-same: #BDD4CA;
+  --hl-box: #EDF2EF;
+  --hl-line: #DCE8E1;
+  --hl-line-edge: rgba(77, 120, 104, .34);
+  --hl-selected: #C8DDD2;
+  --hl-same: #B8D2C6;
   --hl-same-ring: rgba(62, 102, 86, .48);
   --hl-conflict: #F5DCD7;
   --edge: rgba(42, 41, 38, .07);
@@ -56,8 +58,10 @@
   --on-accent: #0F1E18;
   --hint: #D6AC69;
   --warn: #E28C7B;
-  --hl-peer: #222825;
-  --hl-selected: #2B3C34;
+  --hl-box: #1F2421;
+  --hl-line: #27312C;
+  --hl-line-edge: rgba(141, 184, 165, .28);
+  --hl-selected: #2E4239;
   --hl-same: #31463D;
   --hl-same-ring: rgba(141, 184, 165, .38);
   --hl-conflict: #3A2522;
@@ -464,7 +468,10 @@ button:focus-visible {
   opacity: .8;
 }
 
-.cell.is-peer { background: var(--hl-peer); }
+.cell.is-box { background: var(--hl-box); }
+.cell.is-line { background: var(--hl-line); }
+.cell.is-row { box-shadow: inset 0 1px 0 var(--hl-line-edge), inset 0 -1px 0 var(--hl-line-edge); }
+.cell.is-col { box-shadow: inset 1px 0 0 var(--hl-line-edge), inset -1px 0 0 var(--hl-line-edge); }
 .cell.is-same {
   background: var(--hl-same);
   font-weight: 700;

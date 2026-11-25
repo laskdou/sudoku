@@ -310,7 +310,15 @@
 
       if (!G.solved) {
         if (i === selected) c += ' is-selected';
-        else if (selected >= 0 && store.highlightPeers && isPeer(i, selected)) c += ' is-peer';
+        else if (selected >= 0 && store.highlightPeers) {
+          const sameR = E.ROW[i] === E.ROW[selected];
+          const sameC = E.COL[i] === E.COL[selected];
+          const sameB = E.BOX[i] === E.BOX[selected];
+          if (sameR) c += ' is-row';
+          if (sameC) c += ' is-col';
+          if (sameR || sameC) c += ' is-line';
+          else if (sameB) c += ' is-box';
+        }
         if (store.highlightSame && selV && v === selV && i !== selected) c += ' is-same';
         if (v && conflicts[i]) c += ' is-conflict';
       } else c += ' is-solved';
