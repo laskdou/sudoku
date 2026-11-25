@@ -139,12 +139,12 @@ button:focus-visible {
 /* ---------- Каркас ---------- */
 
 .app {
-  --board: max(260px, min(calc(100vw - 12px), 480px, calc(100svh - 285px)));
+  --board: min(calc(100vw - 8px), 480px);
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: max(6px, env(safe-area-inset-top)) 6px max(8px, env(safe-area-inset-bottom));
+  padding: max(6px, env(safe-area-inset-top)) 4px max(8px, env(safe-area-inset-bottom));
 }
 
 .topbar {
@@ -153,7 +153,7 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 2px 6px;
+  padding: 0 6px 4px;
   flex: none;
 }
 
@@ -247,7 +247,7 @@ button:focus-visible {
     "goal"
     "tools"
     "pad";
-  row-gap: 8px;
+  row-gap: 7px;
 }
 
 .diff { grid-area: diff; }
@@ -275,7 +275,7 @@ button:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 7px;
-  height: 36px;
+  height: 40px;
   border-radius: 11px;
   color: var(--muted);
   transition: background-color .25s var(--ease-soft), color .25s var(--ease-soft);
@@ -332,12 +332,12 @@ button:focus-visible {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: 21px;
+  font-size: 24px;
   font-weight: 600;
   letter-spacing: -.01em;
 }
 .diff-sub {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   color: var(--muted);
   margin-top: 2px;
@@ -412,8 +412,8 @@ button:focus-visible {
   display: grid;
   place-items: center;
   background: var(--surface);
-  font-size: calc(var(--board) * .07);
-  font-weight: 550;
+  font-size: calc(var(--board) * .076);
+  font-weight: 600;
   line-height: 1;
   color: var(--accent-ink);
   cursor: pointer;
@@ -518,12 +518,12 @@ button:focus-visible {
 
 .notes {
   position: absolute;
-  inset: 7%;
+  inset: 5%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  font-size: calc(var(--board) * .021);
-  font-weight: 600;
+  font-size: calc(var(--board) * .026);
+  font-weight: 700;
   color: var(--muted);
   pointer-events: none;
 }
@@ -662,8 +662,8 @@ button:focus-visible {
 }
 .tool-ic {
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   display: grid;
   place-items: center;
   border-radius: 50%;
@@ -724,7 +724,7 @@ button:focus-visible {
 
 .key {
   position: relative;
-  height: 56px;
+  height: 60px;
   border-radius: var(--r-sm);
   background: var(--surface);
   box-shadow: var(--shadow-sm);
@@ -739,8 +739,8 @@ button:focus-visible {
 .key:hover { background: var(--surface-2); }
 .key:active { transform: scale(.94); }
 .key .d {
-  font-size: clamp(24px, calc(var(--board) * .07), 29px);
-  font-weight: 550;
+  font-size: clamp(26px, calc(var(--board) * .076), 30px);
+  font-weight: 600;
   line-height: 1;
   transition: font-size .2s var(--ease), transform .2s var(--ease);
 }
