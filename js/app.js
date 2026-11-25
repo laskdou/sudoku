@@ -32,6 +32,7 @@
       bestStreak: 0,
       difficulty: 1,
       theme: 'auto',
+      scheme: 'sage',
       sound: true,
       autoFill: true,
       highlightSame: true,
@@ -868,11 +869,16 @@
   const mq = window.matchMedia('(prefers-color-scheme: dark)');
   function applyTheme() {
     const t = store.theme === 'auto' ? (mq.matches ? 'dark' : 'light') : store.theme;
+    const scheme = store.scheme || 'sage';
     document.documentElement.setAttribute('data-theme', t);
+    document.documentElement.setAttribute('data-scheme', scheme);
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.setAttribute('content', t === 'dark' ? '#131514' : '#F2EFE9');
     document.querySelectorAll('#themeSeg button').forEach((b) => {
       b.classList.toggle('is-active', b.dataset.themeVal === store.theme);
+    });
+    document.querySelectorAll('#schemeGrid button').forEach((b) => {
+      b.classList.toggle('is-active', b.dataset.schemeVal === scheme);
     });
   }
   if (mq.addEventListener) mq.addEventListener('change', applyTheme);
@@ -958,6 +964,13 @@
       const b = e.target.closest('button');
       if (!b) return;
       store.theme = b.dataset.themeVal;
+      save();
+      applyTheme();
+    });
+    $('#schemeGrid').addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      store.scheme = b.dataset.schemeVal;
       save();
       applyTheme();
     });

@@ -21,6 +21,7 @@
         var t = s.theme || 'auto';
         if (t === 'auto') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', t);
+        document.documentElement.setAttribute('data-scheme', s.scheme || 'sage');
       } catch (e) {}
     })();
   </script>
@@ -164,6 +165,16 @@
           <button type="button" data-theme-val="auto">Авто</button>
           <button type="button" data-theme-val="light">Светлая</button>
           <button type="button" data-theme-val="dark">Тёмная</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">Цветовая схема</span>
+        <div class="scheme-grid" id="schemeGrid">
+          <button type="button" class="scheme-btn" data-scheme-val="sage"><i style="background:#4D7868"></i><span>Шалфей</span></button>
+          <button type="button" class="scheme-btn" data-scheme-val="ocean"><i style="background:#3F6A8A"></i><span>Океан</span></button>
+          <button type="button" class="scheme-btn" data-scheme-val="sand"><i style="background:#9C6543"></i><span>Песок</span></button>
+          <button type="button" class="scheme-btn" data-scheme-val="lavender"><i style="background:#6B5B8C"></i><span>Лаванда</span></button>
         </div>
       </div>
 
