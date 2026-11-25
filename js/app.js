@@ -395,7 +395,6 @@
     hintBtn.classList.toggle('is-armed', hintArmedUntil > Date.now());
 
     const playing = !!G && !G.solved && !loading && !autoFilling;
-    $('#undoBtn').disabled = !playing || G.history.length === 0;
     $('#eraseBtn').disabled = !playing;
     hintBtn.disabled = !playing;
     notesBtn.disabled = !playing;
@@ -938,7 +937,6 @@
     $('#timerBtn').addEventListener('click', () => setPaused(!paused));
     $('#resumeBtn').addEventListener('click', () => setPaused(false));
 
-    $('#undoBtn').addEventListener('click', undo);
     $('#eraseBtn').addEventListener('click', erase);
     $('#notesBtn').addEventListener('click', toggleNotes);
     $('#hintBtn').addEventListener('click', onHint);
@@ -1013,7 +1011,7 @@
         }
       });
       closeSheet();
-      toast('Поле очищено. Отменить можно кнопкой «Отменить»');
+      toast('Поле очищено');
       afterChange();
     });
 
@@ -1064,7 +1062,6 @@
       case 'Backspace': case 'Delete': case 'Digit0': case 'Numpad0':
         e.preventDefault(); erase(); break;
       case 'KeyN': e.preventDefault(); toggleNotes(); break;
-      case 'KeyZ': e.preventDefault(); undo(); break;
       case 'KeyH': e.preventDefault(); onHint(); break;
       case 'KeyP': case 'Space': e.preventDefault(); setPaused(!paused); break;
       case 'KeyM':
